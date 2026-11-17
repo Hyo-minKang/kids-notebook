@@ -168,6 +168,7 @@ button:disabled{opacity:.4}
     <div class="field">오늘 할 단계</div>
     <div id="levelList" class="levels"></div>
     <div class="note">단계를 바꾸면 풀던 장은 그 단계의 새 문제로 다시 시작해요. 끝낸 장 수와 스티커는 그대로예요.</div>
+    <div class="note" id="versionText"></div>
     <div class="sheetfoot">
       <button class="parent" id="resetBtn">처음부터 다시</button>
       <button class="primary" id="closeSettings">닫기</button>
@@ -221,6 +222,7 @@ button:disabled{opacity:.4}
 var WEIGHTS = /*WEIGHTS*/;
 var layers = loadModel(WEIGHTS);
 var $ = function (id) { return document.getElementById(id); };
+var APP_VERSION = '0.1';
 var PAGE_SIZE = 10, PAGES_PER_DAY = 10, MAX_ATTEMPTS = 2, REVIEW_DAYS = [1, 3, 7], KEY = 'yena-notebook-v1';
 var STAR = '<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/>';
 
@@ -414,6 +416,7 @@ function renderLevels() {
 $('settingsBtn').addEventListener('click', function () {
   $('nameInput').value = state.name || '예나'; $('namePreview').textContent = state.name || '예나';
   resetArmed = false; $('resetBtn').textContent = '처음부터 다시';
+  $('versionText').textContent = '버전 ' + APP_VERSION;
   renderLevels(); $('settings').hidden = false;
 });
 $('nameInput').addEventListener('input', function () {

@@ -66,6 +66,31 @@ function groupStrokes(strokes) {
     }
     groups.push({ s: it.s, b: it.b });
   });
+  return mergeSmall(groups);
+}
+// 다른 숫자보다 훨씬 작은 획 묶음은 숫자 하나가 아니라 바로 옆 숫자의 일부로 본다.
+// (예: 7의 왼쪽 위에 따로 그은 짧은 획, 5의 윗줄)
+function mergeSmall(groups) {
+  for (var guard = 0; guard < 20 && groups.length > 1; guard++) {
+    var H = 0, i, j;
+    for (i = 0; i < groups.length; i++) H = Math.max(H, groups[i].b.y1 - groups[i].b.y0);
+    var pick = -1, to = -1, best = Infinity;
+    for (i = 0; i < groups.length; i++) {
+      var g = groups[i];
+      if (g.b.y1 - g.b.y0 >= 0.5 * H) continue;            // 키가 절반이 안 되는 묶음만
+      for (j = 0; j < groups.length; j++) {
+        if (j === i) continue;
+        var o = groups[j], gap = Math.max(0, g.b.x0 - o.b.x1, o.b.x0 - g.b.x1);
+        if (gap <= 0.12 * H + 4 && gap < best) { best = gap; pick = i; to = j; }   // 거의 붙어 있을 때만
+      }
+    }
+    if (pick < 0) break;
+    var a = groups[to], c = groups[pick];
+    a.s = a.s.concat(c.s);
+    a.b = { x0: Math.min(a.b.x0, c.b.x0), y0: Math.min(a.b.y0, c.b.y0), x1: Math.max(a.b.x1, c.b.x1), y1: Math.max(a.b.y1, c.b.y1) };
+    groups.splice(pick, 1);
+  }
+  groups.sort(function (p, q) { return p.b.x0 - q.b.x0; });
   return groups;
 }
 // 한 묶음을 MNIST 형식(28x28, 20px 상자, 무게중심 가운데)으로 그린다.
